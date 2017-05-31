@@ -41,6 +41,8 @@ sock2.bind((CLIENT_OUTER_IP, CLIENT_REQUEST_PORT))
 #
 while 1:
 	# get packet routed to our "network"
+    binary_packet = ''
+    
     try:
         binary_packet = os.read(tun, 2048)
     except:
