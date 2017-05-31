@@ -29,12 +29,12 @@ subprocess.check_call("route add -net 10.5.0.0 netmask 255.255.255.0 dev %s" % i
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
-sock.connect((VPN_IP, VPN_PORT))
+sock.bind((CLIENT_OUTER_IP, CLIENT_OUTER_PORT))
 
 sock2 = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
 sock2.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
 sock2.settimeout(0.1)
-#sock2.connect((VPN_IP, VPN_PORT))
+sock2.bind((CLIENT_OUTER_IP, CLIENT_REQUEST_PORT))
 
 #
 #  Now process packets
