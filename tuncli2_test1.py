@@ -29,19 +29,22 @@ subprocess.check_call("route add -net 10.5.0.0 netmask 255.255.255.0 dev %s" % i
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
-sock.connect((VPN_IP, VPN_PORT))
+sock.bind((CLIENT_OUTER_IP, CLIENT_OUTER_PORT))
 
 sock2 = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
 sock2.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
 sock2.settimeout(0.1)
-#sock2.connect((VPN_IP, VPN_PORT))
+sock2.bind((CLIENT_OUTER_IP, CLIENT_REQUEST_PORT))
 
 #
 #  Now process packets
 #
 while 1:
 	# get packet routed to our "network"
-    binary_packet = os.read(tun, 2048)
+    try:
+        binary_packet = os.read(tun, 2048)
+    except:
+        print "resource unavailable"
 
     if binary_packet == '' :
 		print 'os.read read 0 bytes'
@@ -54,10 +57,8 @@ while 1:
         packet = IP(binary_packet)
 
     # Send packet to VPN server over socket  using write() with encapsulation
-	packet_wrapped = IP(src=CLIENT_OUTER_IP, dst=VPN_IP)/UDP(sport=CLIENT_OUTER_PORT, dport=VPN_PORT)/packet
+    packet_wrapped = IP(src=CLIENT_OUTER_IP, dst=VPN_IP)/UDP(sport=CLIENT_OUTER_PORT, dport=VPN_PORT)/packet
 
-    # packet_wrapped.version  = "4L"
-    # packet_wrapped.ihl = "5L"
     del packet_wrapped[IP].chksum
     packet_wrapped = packet_wrapped.__class__(str(packet_wrapped))
 
