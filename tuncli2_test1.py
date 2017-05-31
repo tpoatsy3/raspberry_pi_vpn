@@ -10,7 +10,7 @@ import pytap    # my pytab wrapper around basic system-specific syscalls
 #
 # Global variables
 #
-VPN_IP = '129.170.239.178'
+VPN_IP = '129.170.237.60'
 VPN_PORT = 18958
 CLIENT_IP = '10.5.0.100'
 CLIENT_PORT = 6666
@@ -45,7 +45,7 @@ while 1:
 
     if binary_packet == '' :
 		print 'os.read read 0 bytes'
-      
+
 	# The packet may be IPv4 or IPv6.
     # Parsing IPv6 as IPv4 will give strange results, so check which we got.
     if ord(binary_packet[0]) == 0x60 :
