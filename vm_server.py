@@ -1,15 +1,18 @@
 import sys, socket, select
+from collections import deque
 
 from scapy.all import *
 
 #
 # VPN Server global variabes
 #
-VPN_IP = '192.168.56.101'
+#VPN_IP = '192.168.56.101'
+VPN_IP = '192.168.1.4'
 VPN_PORT = 18958
 BUFFER_SZ = 1024
+CLIENT_RECEIVE_PORT = 6060
 
-pkt_dict = {'10.5.0.100' : None, '10.5.0.2' : None}
+pkt_dict = {'10.5.0.100' : None, '10.5.0.101' : None}
 
 #
 # Function: Respond to Client Request for Packets
@@ -25,10 +28,24 @@ def isRequestPkt( outer_pkt ) :
 #
 # Function: Send requested packets out of Dictionary
 #
-def sendWaitingPkts( outer_pkt ) :
-	print 'sendWaitingPkts not implemented'
-	print 'Sending requested packets to %s ...' % outer_pkt[Raw].load
-	return;
+def sendWaitingPkts( request_pkt ) :
+	b_snt = 0
+	print 'Sending requested packets to %s ...' % request_pkt[Raw].load
+	client_ip = request_pkt[Raw].load
+	if (pkt_dict[client_ip] != None):
+		buffered_pkt = pkt_dict[client_ip].pop(0)
+		b_snt = server_socket.sendto(str(buffered_pkt), (request_pkt[IP].src, CLIENT_RECEIVE_PORT))
+		print 'Sent %d bytes to client' % b_snt
+	return b_snt;
+
+#
+# Function: When a Packet is received, add it to Dictionary
+#
+def addPktToDict( outer_pkt ) :
+	return 0;
+
+
+
 
 
 rSock = []
@@ -73,6 +90,13 @@ while True:
 		innerPkt.show()
 		print
 
+		inner_dst_ip = innerPkt[IP].dst
+		if (inner_dst_ip in pkt_dict):
+			print 'innerPkt destination found in dictionary'
+			if (pkt_dict[inner_dst_ip] == None):
+				pkt_dict[inner_dst_ip] = []
+			pkt_dict[inner_dst_ip].append(innerPkt)
+			
 
 		innerUdp = UDP(response[48:56])
 		destPort = innerUdp.dport
