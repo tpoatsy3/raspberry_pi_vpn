@@ -68,7 +68,7 @@ while 1:
 
     # tell VPN server that I am 10.5.0.100 so it gives me all the packets for that addresses
     # include IP in pull request to server. Have to write that protocol.
-    rec_request_pkt = IP(src=CLIENT_OUTER_IP, dst=VPN_IP)/UDP(sport=CLIENT_REQUEST_PORT,dport=VPN_PORT)/Raw(VPN_IP)
+    rec_request_pkt = IP(src=CLIENT_OUTER_IP, dst=VPN_IP)/UDP(sport=CLIENT_REQUEST_PORT,dport=VPN_PORT)/Raw(CLIENT_IP)
     sock2.sendto(str(rec_request_pkt),(VPN_IP, VPN_PORT))
 
     buff = ''
