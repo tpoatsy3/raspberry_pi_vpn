@@ -42,31 +42,32 @@ sock2.bind((CLIENT_OUTER_IP, CLIENT_REQUEST_PORT))
 while 1:
 	# get packet routed to our "network"
     binary_packet = ''
-    
+
     try:
         binary_packet = os.read(tun, 2048)
+        if binary_packet == '' :
+    		print 'os.read read 0 bytes'
+
+    	# The packet may be IPv4 or IPv6.
+        # Parsing IPv6 as IPv4 will give strange results, so check which we got.
+        if ord(binary_packet[0]) == 0x60 :
+            packet = IPv6(binary_packet)  # Scapy parses byte string into a packet object
+        else:
+            packet = IP(binary_packet)
+
+        # Send packet to VPN server over socket  using write() with encapsulation
+        packet_wrapped = IP(src=CLIENT_OUTER_IP, dst=VPN_IP)/UDP(sport=CLIENT_OUTER_PORT, dport=VPN_PORT)/packet
+
+        del packet_wrapped[IP].chksum
+        packet_wrapped = packet_wrapped.__class__(str(packet_wrapped))
+
+
+        packet_wrapped.show()
+        sock.sendto(str(packet_wrapped),(VPN_IP, VPN_PORT))
     except:
         print "resource unavailable"
 
-    if binary_packet == '' :
-		print 'os.read read 0 bytes'
 
-	# The packet may be IPv4 or IPv6.
-    # Parsing IPv6 as IPv4 will give strange results, so check which we got.
-    if ord(binary_packet[0]) == 0x60 :
-        packet = IPv6(binary_packet)  # Scapy parses byte string into a packet object
-    else:
-        packet = IP(binary_packet)
-
-    # Send packet to VPN server over socket  using write() with encapsulation
-    packet_wrapped = IP(src=CLIENT_OUTER_IP, dst=VPN_IP)/UDP(sport=CLIENT_OUTER_PORT, dport=VPN_PORT)/packet
-
-    del packet_wrapped[IP].chksum
-    packet_wrapped = packet_wrapped.__class__(str(packet_wrapped))
-
-
-    packet_wrapped.show()
-    sock.sendto(str(packet_wrapped),(VPN_IP, VPN_PORT))
 
     # tell VPN server that I am 10.5.0.100 so it gives me all the packets for that addresses
     # include IP in pull request to server. Have to write that protocol.
