@@ -41,7 +41,10 @@ sock2.settimeout(0.1)
 #
 while 1:
 	# get packet routed to our "network"
-    binary_packet = os.read(tun, 2048)
+    try:
+        binary_packet = os.read(tun, 2048)
+    except:
+        print "resource unavailable"
 
     if binary_packet == '' :
 		print 'os.read read 0 bytes'
@@ -54,10 +57,8 @@ while 1:
         packet = IP(binary_packet)
 
     # Send packet to VPN server over socket  using write() with encapsulation
-	packet_wrapped = IP(src=CLIENT_OUTER_IP, dst=VPN_IP)/UDP(sport=CLIENT_OUTER_PORT, dport=VPN_PORT)/packet
+    packet_wrapped = IP(src=CLIENT_OUTER_IP, dst=VPN_IP)/UDP(sport=CLIENT_OUTER_PORT, dport=VPN_PORT)/packet
 
-    # packet_wrapped.version  = "4L"
-    # packet_wrapped.ihl = "5L"
     del packet_wrapped[IP].chksum
     packet_wrapped = packet_wrapped.__class__(str(packet_wrapped))
 
