@@ -10,7 +10,7 @@ import pytap    # my pytab wrapper around basic system-specific syscalls
 #
 # Global variables
 #
-VPN_IP = '129.170.239.178'
+VPN_IP = '192.168.56.101'
 VPN_PORT = 18958
 CLIENT_IP = '10.5.0.100'
 CLIENT_PORT = 6666
@@ -34,7 +34,7 @@ sock.connect((VPN_IP, VPN_PORT))
 sock2 = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
 sock2.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
 sock2.settimeout(0.1)
-sock2.connect((VPN_IP, VPN_PORT))
+#sock2.connect((VPN_IP, VPN_PORT))
 
 #
 #  Now process packets
@@ -42,6 +42,9 @@ sock2.connect((VPN_IP, VPN_PORT))
 while 1:
 	# get packet routed to our "network"
     binary_packet = os.read(tun, 2048)
+
+    if binary_packet == '' :
+		print 'os.read read 0 bytes'
       
 	# The packet may be IPv4 or IPv6.
     # Parsing IPv6 as IPv4 will give strange results, so check which we got.
@@ -59,13 +62,12 @@ while 1:
     packet_wrapped = packet_wrapped.__class__(str(packet_wrapped))
 
 
-    # packet_wrapped.show()
+    packet_wrapped.show()
     sock.sendto(str(packet_wrapped),(VPN_IP, VPN_PORT))
-
 
     # tell VPN server that I am 10.5.0.100 so it gives me all the packets for that addresses
     # include IP in pull request to server. Have to write that protocol.
-    rec_request_pkt = IP(src=CLIENT_OUTER_IP, dst=VPN_IP)/UDP(sport=CLIENT_REQUEST_PORT,dport=VPN_PORT)/Raw(VPN_IP)
+    rec_request_pkt = IP(src=CLIENT_OUTER_IP, dst=VPN_IP)/UDP(sport=CLIENT_REQUEST_PORT,dport=VPN_PORT)/Raw(CLIENT_IP)
     sock2.sendto(str(rec_request_pkt),(VPN_IP, VPN_PORT))
 
     buff = ''
