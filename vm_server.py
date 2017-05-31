@@ -6,8 +6,8 @@ from scapy.all import *
 #
 # VPN Server global variabes
 #
-#VPN_IP = '192.168.56.101'
-VPN_IP = '192.168.1.4'
+VPN_IP = '192.168.56.101'
+#VPN_IP = '192.168.1.4'
 VPN_PORT = 18958
 BUFFER_SZ = 1024
 CLIENT_RECEIVE_PORT = 6060
@@ -33,9 +33,9 @@ def sendWaitingPkts( request_pkt ) :
 	print 'Sending requested packets to %s ...' % request_pkt[Raw].load
 	client_ip = request_pkt[Raw].load
 	if (pkt_dict[client_ip] != None):
-		buffered_pkt = pkt_dict[client_ip].pop(0)
-		b_snt = server_socket.sendto(str(buffered_pkt), (request_pkt[IP].src, CLIENT_RECEIVE_PORT))
-		print 'Sent %d bytes to client' % b_snt
+		buffered_pkt = pkt_dict[client_ip].pop()
+		b_snt = server_socket.sendto(str(buffered_pkt), (request_pkt[IP].src, request_pkt[UDP].sport))
+	print 'Sent %d bytes to client' % b_snt
 	return b_snt;
 
 #
@@ -92,25 +92,27 @@ while True:
 
 		inner_dst_ip = innerPkt[IP].dst
 		if (inner_dst_ip in pkt_dict):
-			print 'innerPkt destination found in dictionary'
+			print 'INNER PKT dest found in dictionary, adding to buffer'
 			if (pkt_dict[inner_dst_ip] == None):
 				pkt_dict[inner_dst_ip] = []
-			pkt_dict[inner_dst_ip].append(innerPkt)
+			pkt_dict[inner_dst_ip].insert(innerPkt, 0)
+		else:
+			print "Did not recognize INNER PKT dest IP"
 			
 
-		innerUdp = UDP(response[48:56])
-		destPort = innerUdp.dport
-		piAddr = raw_pkt.dst
-		sourceAddr = innerPkt.src
-		targetAddr = innerPkt.dst
+		#innerUdp = UDP(response[48:56])
+		#destPort = innerUdp.dport
+		#piAddr = raw_pkt.dst
+		#sourceAddr = innerPkt.src
+		#targetAddr = innerPkt.dst
 
-		print "IP ADDRESSES"
-		print "Pi: ", piAddr
-		print "Source: ", sourceAddr
-		print "Target: ", targetAddr
+		#print "IP ADDRESSES"
+		#print "Pi: ", piAddr
+		#print "Source: ", sourceAddr
+		#print "Target: ", targetAddr
 
-		raw_pkt.dst = targetAddr
-		raw_pkt.src = piAddr
+		#raw_pkt.dst = targetAddr
+		#raw_pkt.src = piAddr
 
 		#outPkt = innerPkt
 		#outPkt.dst = targetAddr
