@@ -12,7 +12,7 @@ import pytap    # my pytab wrapper around basic system-specific syscalls
 #
 VPN_IP = '129.170.237.60'
 VPN_PORT = 18958
-CLIENT_IP = '10.5.0.101'
+CLIENT_IP = '10.5.0.100'
 CLIENT_PORT = 6666
 CLIENT_REQUEST_PORT = 6060
 CLIENT_OUTER_IP = '192.168.56.100'
@@ -24,7 +24,7 @@ CLIENT_OUTER_PORT = 2003
 tun, ifname = pytap.open('tun0')
 print "Allocated interface %s. Configuring it." % ifname
 
-subprocess.check_call("ifconfig %s 10.5.0.101 up" % ifname, shell=True)
+subprocess.check_call("ifconfig %s 10.5.0.100 up" % ifname, shell=True)
 subprocess.check_call("route add -net 10.5.0.0 netmask 255.255.255.0 dev %s" % ifname, shell=True)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
@@ -79,10 +79,12 @@ while 1:
         print "sock2.recvfrom received:"
         print buff
         # Strip the outer header off
+        inner_pkt = buff[28:]
+        inner_pkt.show()
+        os.write(tun, inner_pkt)
     except:
         continue
 
-    os.write(tun, buff)
 
     # print packet.summary()
     # print hexdump(packet)
