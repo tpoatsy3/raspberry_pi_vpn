@@ -12,10 +12,9 @@ import pytap    # my pytab wrapper around basic system-specific syscalls
 #
 VPN_IP = '129.170.237.60'
 VPN_PORT = 18958
-CLIENT_IP = '10.5.0.101'
-CLIENT_PORT = 6666
+CLIENT_IP = '10.5.0.100'
 CLIENT_REQUEST_PORT = 6060
-CLIENT_OUTER_IP = '192.168.56.101'
+CLIENT_OUTER_IP = '192.168.56.100'
 CLIENT_OUTER_PORT = 2003
 
 #
