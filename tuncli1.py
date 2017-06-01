@@ -61,11 +61,11 @@ while 1:
         del packet_wrapped[IP].chksum
         packet_wrapped = packet_wrapped.__class__(str(packet_wrapped))
 
-
+	print "Sending following packet to VPN:"
         packet_wrapped.show()
         sock.sendto(str(packet_wrapped),(VPN_IP, VPN_PORT))
     except:
-		binary_packet = ''
+	binary_packet = ''
 
 
     # tell VPN server that I am 10.5.0.100 so it gives me all the packets for that addresses
@@ -79,8 +79,10 @@ while 1:
         print "sock2.recvfrom received:"
         print buff
         # Strip the outer header off
-        inner_pkt = buff[28:]
+        inner_pkt = buff[28:len(buff)]
+	print "Inner packer to be writted to tun0:"
         inner_pkt.show()
+	print
         os.write(tun, inner_pkt)
     except:
         continue
