@@ -36,8 +36,11 @@ def sendWaitingPkts( request_pkt ) :
 		return b_snt
 	if ((len(pkt_dict[client_ip]) != 0)):
 		buffered_pkt = pkt_dict[client_ip].pop()
-		b_snt = server_socket.sendto(str(buffered_pkt), (request_pkt[IP].src, CLIENT_RECEIVE_PORT))
+		wrapped_pkt = IP(src=VPN_IP, dst=request_pkt[IP].src)/UDP(sport=VPN_PORT, dport=request_pkt[UDP].sport)/buffered_pkt
+		b_snt = server_socket.sendto(str(wrapped_pkt), (request_pkt[IP].src,request_pkt[UDP].sport ))
+		print buffered_pkt.show()
 	print 'Sent %d bytes to client' % b_snt
+	
 	return b_snt;
 
 #
