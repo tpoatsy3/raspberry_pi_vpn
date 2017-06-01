@@ -19,13 +19,16 @@ pkt_dict = {'10.5.0.100' : None, '10.5.0.101' : None}
 #
 def isRequestPkt( outer_pkt ) :
 	if (outer_pkt.len < 1):
-		return False;
-	client_ip = outer_pkt[Raw].load
+		return False
+	try:
+		client_ip = outer_pkt[Raw].load
+	except:
+		return False
 	print "checking if %s is in pkt_dict..." % client_ip
 	if (client_ip in pkt_dict):
 		return True
 	else:
-		return False;
+		return False
 
 #
 # Function: Send requested packets out of Dictionary
@@ -42,7 +45,7 @@ def sendWaitingPkts( request_pkt ) :
 		b_snt = server_socket.sendto(str(wrapped_pkt), (request_pkt[IP].src,request_pkt[UDP].sport ))
 		print buffered_pkt.show()
 	print 'Sent %d bytes to client' % b_snt
-	
+
 	return b_snt;
 
 #
