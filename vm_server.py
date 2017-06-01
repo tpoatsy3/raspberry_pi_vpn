@@ -23,7 +23,7 @@ def isRequestPkt( outer_pkt ) :
 	if (client_ip in pkt_dict):
 		return True
 	else:
-		return False;		
+		return False;
 
 #
 # Function: Send requested packets out of Dictionary
@@ -34,7 +34,7 @@ def sendWaitingPkts( request_pkt ) :
 	client_ip = request_pkt[Raw].load
 	if (pkt_dict[client_ip] != None):
 		buffered_pkt = pkt_dict[client_ip].pop()
-		b_snt = server_socket.sendto(str(buffered_pkt), (request_pkt[IP].src, request_pkt[UDP].sport))
+		b_snt = server_socket.sendto(str(buffered_pkt), (request_pkt[IP].src, CLIENT_RECEIVE_PORT))
 	print 'Sent %d bytes to client' % b_snt
 	return b_snt;
 
@@ -72,7 +72,7 @@ while True:
 	print "OUTER PACKET"
 	raw_pkt.show()
 	print
-	
+
 
 	#
 	# Is Packet a Request Pkt or Traffic Pkt
@@ -98,7 +98,7 @@ while True:
 			pkt_dict[inner_dst_ip].insert(innerPkt, 0)
 		else:
 			print "Did not recognize INNER PKT dest IP"
-			
+
 
 		#innerUdp = UDP(response[48:56])
 		#destPort = innerUdp.dport
@@ -142,4 +142,3 @@ server_socket.close()
 # InnerDest 	-> Target
 # OuterSource	-> Pi
 # OuterDest	-> Target
-
