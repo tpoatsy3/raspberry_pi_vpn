@@ -6,8 +6,8 @@ from scapy.all import *
 #
 # VPN Server global variabes
 #
-VPN_IP = '192.168.56.101'
-#VPN_IP = '192.168.1.4'
+#VPN_IP = '192.168.56.101'
+VPN_IP = '192.168.1.4'
 VPN_PORT = 18958
 BUFFER_SZ = 1024
 CLIENT_RECEIVE_PORT = 6060
@@ -32,7 +32,9 @@ def sendWaitingPkts( request_pkt ) :
 	b_snt = 0
 	print 'Sending requested packets to %s ...' % request_pkt[Raw].load
 	client_ip = request_pkt[Raw].load
-	if (pkt_dict[client_ip] != None):
+	if (pkt_dict[client_ip] == None):
+		return b_snt
+	if ((len(pkt_dict[client_ip]) != 0)):
 		buffered_pkt = pkt_dict[client_ip].pop()
 		b_snt = server_socket.sendto(str(buffered_pkt), (request_pkt[IP].src, request_pkt[UDP].sport))
 	print 'Sent %d bytes to client' % b_snt
@@ -95,7 +97,7 @@ while True:
 			print 'INNER PKT dest found in dictionary, adding to buffer'
 			if (pkt_dict[inner_dst_ip] == None):
 				pkt_dict[inner_dst_ip] = []
-			pkt_dict[inner_dst_ip].insert(innerPkt, 0)
+			pkt_dict[inner_dst_ip].insert(0, innerPkt)
 		else:
 			print "Did not recognize INNER PKT dest IP"
 			
