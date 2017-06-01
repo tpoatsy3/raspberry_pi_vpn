@@ -74,15 +74,17 @@ while 1:
     sock2.sendto(str(rec_request_pkt),(VPN_IP, VPN_PORT))
 
     buff = ''
-    try:
+	try:
         buff, address = sock2.recvfrom(1500)
         print "sock2.recvfrom received:"
         print buff
         # Strip the outer header off
+		inner_pkt = buff[28:]
+		inner_pkt.show()
+    	os.write(tun, inner_pkt)
     except:
         continue
 
-    os.write(tun, buff)
 
     # print packet.summary()
     # print hexdump(packet)
