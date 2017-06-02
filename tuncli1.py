@@ -25,6 +25,8 @@ tun, ifname = pytap.open('tun0')
 print "Allocated interface %s. Configuring it." % ifname
 
 subprocess.check_call("ifconfig %s 10.5.0.100 up" % ifname, shell=True)
+subprocess.check_call("ifconfig %s mtu 1000" % ifname, shell=True)
+subprocess.check_call("ifconfig eth0 mtu 1000", shell=True)
 subprocess.check_call("route add -net 10.5.0.0 netmask 255.255.255.0 dev %s" % ifname, shell=True)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
