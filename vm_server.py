@@ -29,7 +29,6 @@ def isRequestPkt( outer_pkt ) :
 		return True
 	else:
 		return False
-		
 
 #
 # Function: Send requested packets out of Dictionary
