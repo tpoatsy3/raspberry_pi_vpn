@@ -9,7 +9,7 @@ from scapy.all import *
 #VPN_IP = '192.168.56.101'
 VPN_IP = '192.168.1.4'
 VPN_PORT = 18958
-BUFFER_SZ = 1024
+BUFFER_SZ = 1500
 CLIENT_RECEIVE_PORT = 6060
 
 pkt_dict = {'10.5.0.100' : None, '10.5.0.101' : None}
@@ -41,12 +41,12 @@ def sendWaitingPkts( request_pkt ) :
 	if (pkt_dict[client_ip] == None):
 		return b_snt
 	if ((len(pkt_dict[client_ip]) != 0)):
-		buffered_pkt = pkt_dict[client_ip].pop()
-		wrapped_pkt = IP(src=VPN_IP, dst=request_pkt[IP].src)/UDP(sport=VPN_PORT, dport=request_pkt[UDP].sport)/buffered_pkt
-		b_snt = server_socket.sendto(str(wrapped_pkt), (request_pkt[IP].src,request_pkt[UDP].sport ))
-		print buffered_pkt.show()
-	print 'Sent %d bytes to client' % b_snt
-
+		for i in range(0, len(pkt_dict[client_ip])):
+			buffered_pkt = pkt_dict[client_ip].pop()
+			wrapped_pkt = IP(src=VPN_IP, dst=request_pkt[IP].src)/UDP(sport=VPN_PORT, dport=request_pkt[UDP].sport)/buffered_pkt
+			b_snt = server_socket.sendto(str(wrapped_pkt), (request_pkt[IP].src,request_pkt[UDP].sport ))
+			print buffered_pkt.show()
+			print 'Sent %d bytes to client' % b_snt
 	return b_snt;
 
 #
