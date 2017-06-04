@@ -101,4 +101,4 @@ Meanwhile, the clients are constantly sending packets to the server requesting t
 The client receives whatever packets the server sends to it, unwraps the packets, and interprets them through the kernel. 
  
 ## Architecture Diagram
-![alt text](https://gitlab.cs.dartmouth.edu/sayeghro/cs60-final-project/blob/master/diagram.png "VPN Diagram")
+![alt text](https://gitlab.cs.dartmouth.edu/sayeghro/cs60-final-project/raw/master/diagram.png "VPN Diagram")
